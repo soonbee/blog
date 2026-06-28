@@ -9,11 +9,19 @@ interface Props {
   updatedDate?: Date;
   heroImage?: ImageMetadata;   // 3단계 image()가 만든 타입
   tags?: string[];
+  ogImage?: string;            // hero 또는 자동 생성 카드 URL
 }
-const { title, description, pubDate, updatedDate, heroImage, tags = [] } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tags = [], ogImage } = Astro.props;
 ---
 
-<BaseLayout {title} {description} article pubDate={pubDate} image={heroImage?.src}>
+<BaseLayout
+  {title}
+  {description}
+  article
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  image={ogImage ?? heroImage?.src}
+>
   <article>
     {heroImage && (
       <Image

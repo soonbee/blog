@@ -1,10 +1,12 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
+import { getPublishedPosts } from '../../lib/posts';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 // 어떤 URL들을 빌드할지 Astro에 알려줌 — [...] 라우트엔 필수
+// getPublishedPosts: prod에선 draft 제외 → 초안이 빌드/색인되지 않음
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = await getPublishedPosts();
   return posts.map((post) => ({
     params: { slug: post.id },   // 파일명 기반 id가 곧 slug
     props: { post },             // 페이지로 글 데이터 전달
@@ -13,8 +15,11 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content, headings } = await render(post);  // headings는 11단계 TOC용
+
+// OG 이미지: hero 있으면 hero, 없으면 자동 생성된 카드(/og/<id>.png)
+const ogImage = post.data.heroImage?.src ?? `/og/${post.id}.png`;
 ---
 
-<BlogPost {...post.data}>
+<BlogPost {...post.data} ogImage={ogImage}>
   <Content />
 </BlogPost>
