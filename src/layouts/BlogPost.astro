@@ -15,7 +15,17 @@ const { title, description, pubDate, updatedDate, heroImage, tags = [] } = Astro
 
 <BaseLayout {title} {description} article pubDate={pubDate} image={heroImage?.src}>
   <article>
-    {heroImage && <Image src={heroImage} alt={title} />}
+    {heroImage && (
+      <Image
+        src={heroImage}
+        alt={title}
+        widths={[400, 720, 1080, 1440]}
+        sizes="(max-width: 720px) 100vw, 720px"
+        loading="eager"
+        fetchpriority="high"
+        quality={80}
+      />
+    )}
     <h1>{title}</h1>
     <time datetime={pubDate.toISOString()}>
       {pubDate.toLocaleDateString('ko-KR')}
