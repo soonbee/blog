@@ -1,0 +1,20 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+// 어떤 URL들을 빌드할지 Astro에 알려줌 — [...] 라우트엔 필수
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id },   // 파일명 기반 id가 곧 slug
+    props: { post },             // 페이지로 글 데이터 전달
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);  // headings는 11단계 TOC용
+---
+
+<BlogPost {...post.data}>
+  <Content />
+</BlogPost>

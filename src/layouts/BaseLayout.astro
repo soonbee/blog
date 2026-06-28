@@ -1,0 +1,36 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+interface Props {
+  title?: string;        // 없으면 사이트 기본 타이틀
+  description?: string;  // 없으면 사이트 기본 설명
+  image?: string;        // OG 이미지 경로
+  article?: boolean;     // 글이면 og:type=article
+  pubDate?: Date;
+}
+
+const {
+  title = SITE_TITLE,
+  description = SITE_DESCRIPTION,
+  ...rest
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <BaseHead title={title} description={description} {...rest} />
+    <ClientRouter />   <!-- 페이지 전환 효과 (체감용, 불필요하면 제거) -->
+  </head>
+  <body>
+    <Header />
+    <main transition:animate="fade">
+      <slot />   <!-- 각 페이지 내용이 여기 들어옴 -->
+    </main>
+    <Footer />
+  </body>
+</html>
