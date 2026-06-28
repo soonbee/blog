@@ -24,6 +24,15 @@ const {
 <html lang="ko">
   <head>
     <BaseHead title={title} description={description} {...rest} />
+    <!-- FOUC 방지: 페인트 전에 테마 확정 (저장값 → 시스템설정 순) -->
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem('theme');
+        const theme =
+          saved ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     <ClientRouter />   <!-- 페이지 전환 효과 (체감용, 불필요하면 제거) -->
   </head>
   <body>

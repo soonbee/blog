@@ -11,14 +11,42 @@ import HeaderLink from './HeaderLink.astro';
 			<HeaderLink href="/tags">Tags</HeaderLink>
 			<HeaderLink href="/about">About</HeaderLink>
 		</div>
+		<button id="theme-toggle" type="button" aria-label="테마 전환">
+			<span class="sr-only">테마 전환</span>
+			<span aria-hidden="true" class="icon"></span>
+		</button>
 	</nav>
 </header>
+
+<script>
+	function setupThemeToggle() {
+		const btn = document.getElementById('theme-toggle');
+		if (!btn) return;
+		const icon = btn.querySelector('.icon');
+		const render = () => {
+			const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+			if (icon) icon.textContent = dark ? '☀️' : '🌙';
+			btn.setAttribute('aria-label', dark ? '라이트 모드로 전환' : '다크 모드로 전환');
+		};
+		// onclick 대입이라 페이지 전환마다 재실행돼도 리스너 중복 없음
+		btn.onclick = () => {
+			const next =
+				document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', next);
+			localStorage.setItem('theme', next);
+			render();
+		};
+		render();
+	}
+	// ClientRouter: 최초 로드 + 매 페이지 전환마다 발생
+	document.addEventListener('astro:page-load', setupThemeToggle);
+</script>
 <style>
 	header {
 		margin: 0;
 		padding: 0 1em;
-		background: white;
-		box-shadow: 0 2px 8px rgba(var(--black), 5%);
+		background: var(--surface);
+		box-shadow: 0 2px 8px rgba(var(--gray), 15%);
 	}
 	h2 {
 		margin: 0;
@@ -36,12 +64,25 @@ import HeaderLink from './HeaderLink.astro';
 	}
 	nav a {
 		padding: 1em 0.5em;
-		color: var(--black);
+		color: rgb(var(--black));
 		border-bottom: 4px solid transparent;
 		text-decoration: none;
 	}
 	nav a.active {
 		text-decoration: none;
 		border-bottom-color: var(--accent);
+	}
+	#theme-toggle {
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: 1.1rem;
+		line-height: 1;
+		padding: 0.5em;
+		border-radius: 6px;
+		color: inherit;
+	}
+	#theme-toggle:hover {
+		background: rgba(var(--gray), 15%);
 	}
 </style>
