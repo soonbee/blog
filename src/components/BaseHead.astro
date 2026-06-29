@@ -29,6 +29,9 @@ const ogImageURL = new URL(image, Astro.site);
 // 브라우저 탭 제목: 홈은 사이트명만, 그 외엔 "제목 · 사이트명"
 const pageTitle = title === SITE_TITLE ? title : `${title} · ${SITE_TITLE}`;
 
+// Cloudflare Web Analytics 비콘 토큰 (공개값). 프로덕션 빌드에서만 주입.
+const cfBeaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
+
 // 구조화 데이터 (검색엔진용)
 const jsonLd = article
   ? {
@@ -87,3 +90,15 @@ const jsonLd = article
 
 <!-- 구조화 데이터 -->
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+<!-- Cloudflare Web Analytics (프로덕션 + 토큰 존재 시에만) -->
+{
+  import.meta.env.PROD && cfBeaconToken && (
+    <script
+      is:inline
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
+    />
+  )
+}
