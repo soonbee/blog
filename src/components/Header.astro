@@ -1,16 +1,10 @@
 ---
 import { SITE_TITLE } from '../consts';
-import HeaderLink from './HeaderLink.astro';
 ---
 
 <header>
 	<nav>
 		<h2><a href="/">{SITE_TITLE}</a></h2>
-		<div class="internal-links">
-			<HeaderLink href="/">Home</HeaderLink>
-			<HeaderLink href="/tags">Tags</HeaderLink>
-			<HeaderLink href="/about">About</HeaderLink>
-		</div>
 		<button id="theme-toggle" type="button" aria-label="테마 전환">
 			<span class="sr-only">테마 전환</span>
 			<span aria-hidden="true" class="icon"></span>
@@ -61,6 +55,7 @@ import HeaderLink from './HeaderLink.astro';
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		height: 4.5rem;
 	}
 	nav a {
 		padding: 1em 0.5em;

@@ -6,8 +6,8 @@
 
 :root {
 	color-scheme: light;
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
+	--accent: #4f46e5; /* 인디고 */
+	--accent-dark: #3730a3;
 	--black: 15, 18, 25;
 	--gray: 96, 115, 159;
 	--gray-light: 229, 233, 240;
@@ -35,6 +35,10 @@ body {
 	font-family: var(--font-atkinson);
 	margin: 0;
 	padding: 0;
+	/* 콘텐츠가 적어도 푸터가 화면 하단에 붙도록 (sticky footer) */
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 	text-align: left;
 	background: linear-gradient(var(--gray-gradient)) no-repeat;
 	background-color: var(--bg); /* 그래디언트 아래 영역 바탕 */
@@ -51,8 +55,10 @@ body {
 main {
 	width: 720px;
 	max-width: calc(100% - 2em);
-	margin: auto;
+	margin: 0 auto; /* 가로만 중앙정렬 (flex 컬럼에서 상하 auto는 grow와 충돌) */
 	padding: 3em 1em;
+	/* 남는 세로 공간을 채워 푸터를 아래로 밀어냄 */
+	flex: 1 0 auto;
 }
 h1,
 h2,
@@ -65,19 +71,19 @@ h6 {
 	line-height: 1.2;
 }
 h1 {
-	font-size: 3.052em;
+	font-size: 1.75em;
 }
 h2 {
-	font-size: 2.441em;
+	font-size: 1.45em;
 }
 h3 {
-	font-size: 1.953em;
+	font-size: 1.25em;
 }
 h4 {
-	font-size: 1.563em;
+	font-size: 1.1em;
 }
 h5 {
-	font-size: 1.25em;
+	font-size: 1em;
 }
 strong,
 b {
@@ -114,11 +120,14 @@ code {
 	padding: 2px 5px;
 	background-color: rgb(var(--gray-light));
 	border-radius: 2px;
+	font-size: 0.9em; /* 인라인 코드 → 18px */
 }
 pre {
 	padding: 1.5em;
 	border-radius: 8px;
 	overflow-x: auto;
+	font-size: 0.8em; /* 코드블럭 → 16px (pre>code는 all:unset이라 여기서 결정) */
+	border: 1px solid rgb(var(--gray-light));
 }
 pre > code {
 	all: unset;
@@ -129,29 +138,42 @@ pre > code {
 .astro-code,
 .astro-code span {
 	color: var(--shiki-light);
-	background-color: var(--shiki-light-bg);
 	font-style: var(--shiki-light-font-style);
 	font-weight: var(--shiki-light-font-weight);
 	text-decoration: var(--shiki-light-text-decoration);
+}
+/* 2번: 페이지(#fff)와 구분되는 패널 배경. 토큰 span은 투명 처리해 흰 타일 방지 */
+.astro-code {
+	background-color: #f6f8fa;
+}
+.astro-code span {
+	background-color: transparent;
 }
 /* 8단계 수동 토글: data-theme=dark면 무조건 dark */
 :root[data-theme='dark'] .astro-code,
 :root[data-theme='dark'] .astro-code span {
 	color: var(--shiki-dark);
-	background-color: var(--shiki-dark-bg);
 	font-style: var(--shiki-dark-font-style);
 	font-weight: var(--shiki-dark-font-weight);
 	text-decoration: var(--shiki-dark-text-decoration);
+}
+/* 다크: 페이지(#0d1117)보다 밝은 표면색으로 구분 */
+:root[data-theme='dark'] .astro-code {
+	background-color: var(--surface);
+	border-color: rgba(var(--gray), 25%);
 }
 /* 토글 도입 전: 시스템이 dark면 dark (단 data-theme=light로 명시하면 제외) */
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme='light']) .astro-code,
 	:root:not([data-theme='light']) .astro-code span {
 		color: var(--shiki-dark);
-		background-color: var(--shiki-dark-bg);
 		font-style: var(--shiki-dark-font-style);
 		font-weight: var(--shiki-dark-font-weight);
 		text-decoration: var(--shiki-dark-text-decoration);
+	}
+	:root:not([data-theme='light']) .astro-code {
+		background-color: var(--surface);
+		border-color: rgba(var(--gray), 25%);
 	}
 }
 blockquote {

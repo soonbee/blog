@@ -1,0 +1,95 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { getPublishedPosts } from '../lib/posts';
+
+// 1페이지는 "/", 이후 "/2", "/3"... (rest 파라미터라 첫 페이지에 경로 세그먼트가 안 붙음)
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getPublishedPosts();
+  return paginate(posts, { pageSize: 10 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page: Page<CollectionEntry<'blog'>> };
+---
+
+<BaseLayout>
+  <h1>Posts</h1>
+  <ul class="post-list">
+    {page.data.map((post) => (
+      <li>
+        <FormattedDate date={post.data.pubDate} />
+        <a href={`/posts/${post.id}/`} class="title">{post.data.title}</a>
+      </li>
+    ))}
+  </ul>
+
+  {
+    (page.url.prev || page.url.next) && (
+      <nav class="pagination" aria-label="페이지 이동">
+        {page.url.prev ? <a href={page.url.prev}>← 이전</a> : <span />}
+        <span class="page-info">{page.currentPage} / {page.lastPage}</span>
+        {page.url.next ? <a href={page.url.next}>다음 →</a> : <span />}
+      </nav>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .post-list li {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* 자식이 줄 전체로 늘어나지 않게 → 링크는 텍스트 폭만 */
+    gap: 0.1rem;
+    margin-bottom: 0.9rem;
+    line-height: 1.4;
+  }
+  /* 날짜는 FormattedDate가 렌더하는 <time> → :global로 타깃 */
+  .post-list :global(time) {
+    flex: none;
+    color: rgb(var(--gray));
+    font-size: 0.95em;
+  }
+  /* 링크는 제목 텍스트만 감쌈 → 빈 여백/날짜 클릭 시 이동 안 됨 */
+  .post-list .title {
+    color: var(--accent);
+    font-size: 1.15em;
+    text-decoration: none;
+  }
+  .post-list .title:hover {
+    text-decoration: underline;
+  }
+
+  /* 데스크톱: 한 줄(날짜 고정폭 + 제목) */
+  @media (min-width: 640px) {
+    .post-list li {
+      flex-direction: row;
+      gap: 1rem;
+      align-items: baseline;
+    }
+    .post-list :global(time) {
+      width: 8rem;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2.5rem;
+  }
+  .pagination a {
+    text-decoration: none;
+    color: var(--accent);
+  }
+  .pagination .page-info {
+    color: rgb(var(--gray));
+    font-size: 0.9rem;
+  }
+</style>

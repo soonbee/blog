@@ -49,7 +49,7 @@ const { title, description, pubDate, updatedDate, heroImage, tags = [], ogImage,
         <slot />   <!-- 4단계의 <Content /> 가 여기 들어옴 -->
         {tags.length > 0 && (
           <footer class="tags">
-            {tags.map((tag) => <a href={`/tags/${tag}/`}>#{tag}</a>)}
+            {tags.map((tag) => <span class="tag">{tag}</span>)}
           </footer>
         )}
       </div>
@@ -58,15 +58,30 @@ const { title, description, pubDate, updatedDate, heroImage, tags = [], ogImage,
 </BaseLayout>
 
 <style>
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+  /* 비클릭 회색 배지 */
+  .tags .tag {
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(var(--gray-light));
+    color: rgb(var(--gray));
+    font-size: 0.85em;
+  }
+
   /* 넓은 화면에서만 2열. 그 외엔 일반 블록(목차는 본문 상단 접이식으로 폴백) */
-  @media (min-width: 1280px) {
+  @media (min-width: 1320px) {
     .post-grid {
       display: grid;
       grid-template-columns: 1fr 220px;
-      column-gap: 2rem;
+      column-gap: 3rem;
       align-items: start;
       /* 720px 본문 오른쪽 여백으로 그리드를 확장 → 본문 폭은 그대로 720 유지 */
-      margin-right: calc(-220px - 2rem);
+      margin-right: calc(-220px - 3rem);
     }
     .post-main {
       grid-column: 1;
