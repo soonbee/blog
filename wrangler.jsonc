@@ -1,0 +1,11 @@
+{
+  // Cloudflare Workers (정적 에셋 전용) 배포 설정.
+  // Astro가 빌드한 dist/ 를 그대로 서빙한다. 서버 코드(main)는 없음.
+  "name": "soonbee-tech-blog",
+  "compatibility_date": "2025-06-01",
+  "assets": {
+    "directory": "./dist",
+    // 없는 경로 요청 시 Astro가 만든 404.html을 404 상태로 응답
+    "not_found_handling": "404-page"
+  }
+}
