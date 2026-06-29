@@ -1,0 +1,111 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+
+// h2/h3만: h1은 글 제목, h4 이하는 노이즈
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const hasToc = toc.length >= 2;
+---
+
+{
+  hasToc && (
+    <>
+      {/* 넓은 화면(>=1240px): 본문 오른쪽 여백에 sticky 고정 */}
+      <nav class="toc toc-sidebar" aria-label="목차">
+        <p class="toc-title">목차</p>
+        <ul>
+          {toc.map((h) => (
+            <li class={h.depth === 3 ? 'sub' : ''}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* 좁은 화면: 본문 상단 접이식(기본 접힘) 폴백 */}
+      <details class="toc toc-inline">
+        <summary class="toc-title">목차</summary>
+        <ul>
+          {toc.map((h) => (
+            <li class={h.depth === 3 ? 'sub' : ''}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </>
+  )
+}
+
+<style>
+  .toc ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .toc li {
+    margin: 0.3rem 0;
+    line-height: 1.4;
+    font-size: 0.9rem;
+  }
+  .toc li.sub {
+    padding-left: 1rem;
+  }
+  .toc a {
+    text-decoration: none;
+    color: rgb(var(--gray-dark));
+  }
+  .toc a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .toc-title {
+    margin: 0 0 0.5rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  /* 기본(좁은 화면): 사이드바 숨기고 상단 접이식만 노출 */
+  .toc-sidebar {
+    display: none;
+  }
+  .toc-inline {
+    margin: 0 0 2rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid rgba(var(--gray), 25%);
+    border-radius: 8px;
+  }
+  .toc-inline summary {
+    cursor: pointer;
+    margin-bottom: 0;
+  }
+  .toc-inline[open] summary {
+    margin-bottom: 0.5rem;
+  }
+
+  /* 넓은 화면: 본문 오른쪽 열에 배치.
+     본문 시작 위치에서 같이 시작 → 스크롤로 top:6rem에 닿으면 sticky 고정 */
+  @media (min-width: 1280px) {
+    .toc-inline {
+      display: none;
+    }
+    .toc-sidebar {
+      display: block;
+      grid-column: 2;
+      grid-row: 1;
+      position: sticky;
+      top: 6rem;
+      align-self: start; /* 그리드 행 높이에 늘어나지 않게 → sticky 동작 보장 */
+      max-height: calc(100vh - 8rem);
+      overflow-y: auto;
+      padding-left: 1rem;
+      border-left: 2px solid rgba(var(--gray), 25%);
+    }
+  }
+</style>

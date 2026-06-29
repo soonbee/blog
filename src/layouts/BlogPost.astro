@@ -1,6 +1,8 @@
 ---
+import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import { Image } from 'astro:assets';
+import TableOfContents from '../components/TableOfContents.astro';
 
 interface Props {
   title: string;
@@ -10,8 +12,9 @@ interface Props {
   heroImage?: ImageMetadata;   // 3단계 image()가 만든 타입
   tags?: string[];
   ogImage?: string;            // hero 또는 자동 생성 카드 URL
+  headings?: MarkdownHeading[]; // 11단계 TOC용
 }
-const { title, description, pubDate, updatedDate, heroImage, tags = [], ogImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tags = [], ogImage, headings = [] } = Astro.props;
 ---
 
 <BaseLayout
@@ -34,16 +37,41 @@ const { title, description, pubDate, updatedDate, heroImage, tags = [], ogImage 
         quality={80}
       />
     )}
-    <h1>{title}</h1>
-    <time datetime={pubDate.toISOString()}>
-      {pubDate.toLocaleDateString('ko-KR')}
-    </time>
-    {updatedDate && <p>수정: {updatedDate.toLocaleDateString('ko-KR')}</p>}
-    <slot />   <!-- 4단계의 <Content /> 가 여기 들어옴 -->
-    {tags.length > 0 && (
-      <footer class="tags">
-        {tags.map((tag) => <a href={`/tags/${tag}/`}>#{tag}</a>)}
-      </footer>
-    )}
+    <!-- 넓은 화면: [본문 720][목차] 2열 그리드. 음수 마진으로 우측 여백까지 확장 -->
+    <div class="post-grid">
+      <TableOfContents headings={headings} />
+      <div class="post-main">
+        <h1>{title}</h1>
+        <time datetime={pubDate.toISOString()}>
+          {pubDate.toLocaleDateString('ko-KR')}
+        </time>
+        {updatedDate && <p>수정: {updatedDate.toLocaleDateString('ko-KR')}</p>}
+        <slot />   <!-- 4단계의 <Content /> 가 여기 들어옴 -->
+        {tags.length > 0 && (
+          <footer class="tags">
+            {tags.map((tag) => <a href={`/tags/${tag}/`}>#{tag}</a>)}
+          </footer>
+        )}
+      </div>
+    </div>
   </article>
 </BaseLayout>
+
+<style>
+  /* 넓은 화면에서만 2열. 그 외엔 일반 블록(목차는 본문 상단 접이식으로 폴백) */
+  @media (min-width: 1280px) {
+    .post-grid {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      column-gap: 2rem;
+      align-items: start;
+      /* 720px 본문 오른쪽 여백으로 그리드를 확장 → 본문 폭은 그대로 720 유지 */
+      margin-right: calc(-220px - 2rem);
+    }
+    .post-main {
+      grid-column: 1;
+      grid-row: 1;
+      min-width: 0; /* 코드블록 등 넘침 방지 */
+    }
+  }
+</style>
